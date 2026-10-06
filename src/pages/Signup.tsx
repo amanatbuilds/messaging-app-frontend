@@ -1,7 +1,66 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { API_URL } from "../lib/config";
+import { useNavigate } from "react-router";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [signupErrors, setSignupErrors] = useState("");
+  const navigate = useNavigate();
+
+  const signupSchema = z.object({
+    name: z
+      .string()
+      .trim()
+      .min(3, { error: "Name must be at least 3 character" }),
+    username: z
+      .string()
+      .trim()
+      .min(3, { error: "Username must be at least 3 character" })
+      .max(20, "Username cannot exceed greater than 20 characters")
+      .regex(/^[a-zA-Z0-9_]+$/, {
+        error: "Username can only contain letter, number and underscore",
+      }),
+    password: z
+      .string()
+      .trim()
+      .min(8, "Password must be at least 8 characters long."),
+  });
+
+  type Schema = z.infer<typeof signupSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(signupSchema),
+  });
+
+  const submitSignup = async ({ name, username, password }: Schema) => {
+    console.log(API_URL);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, username, password }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setSignupErrors(data.error);
+      }
+      const { success } = data;
+      if (success) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0b0d11] flex items-center justify-center px-6 text-white">
@@ -37,8 +96,12 @@ export default function SignupPage() {
             Start messaging your team in minutes
           </p>
         </div>
-
-        <form className="space-y-3">
+        {signupErrors && (
+          <p className="text-red-500 text-center text-md my-3 border border-red-500 py-1">
+            {signupErrors}
+          </p>
+        )}
+        <form className="space-y-3" onSubmit={handleSubmit(submitSignup)}>
           {/* Full name */}
           <div>
             <label
@@ -51,6 +114,7 @@ export default function SignupPage() {
             <input
               id="name"
               type="text"
+              {...register("name")}
               placeholder="Jane Cooper"
               className="
                 w-full h-9
@@ -66,21 +130,25 @@ export default function SignupPage() {
                 focus:ring-1 focus:ring-[#6858f5]
               "
             />
+            {errors.name && (
+              <p className="text-[12px] text-red-400">{errors.name.message}</p>
+            )}
           </div>
 
           {/* Work email */}
           <div>
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block mb-1.5 text-[13px] text-[#aeb4c4]"
             >
-              Work email
+              Username
             </label>
 
             <input
-              id="email"
-              type="email"
-              placeholder="jane@company.com"
+              id="username"
+              type="text"
+              placeholder="jane_10"
+              {...register("username")}
               className="
                 w-full h-9
                 rounded-[7px]
@@ -95,6 +163,11 @@ export default function SignupPage() {
                 focus:ring-1 focus:ring-[#6858f5]
               "
             />
+            {errors.username && (
+              <p className="text-[12px] text-red-400">
+                {errors.username.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -111,6 +184,7 @@ export default function SignupPage() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••••"
+                {...register("password")}
                 className="
                   w-full h-9
                   rounded-[7px]
@@ -125,6 +199,11 @@ export default function SignupPage() {
                   focus:ring-1 focus:ring-[#6858f5]
                 "
               />
+              {errors.password && (
+                <p className="text-[12px] text-red-400">
+                  {errors.password.message}
+                </p>
+              )}
 
               <button
                 type="button"
@@ -178,7 +257,7 @@ export default function SignupPage() {
               bg-[#6858f5]
               hover:bg-[#7667ff]
               active:bg-[#5c4de3]
-              text-[13px]
+              text-[16px]
               font-semibold
               transition-colors
               mt-1 cursor-pointer
@@ -189,10 +268,11 @@ export default function SignupPage() {
         </form>
 
         {/* Login */}
-        <p className="text-center mt-5 text-[12px] text-[#a0a6b5]">
+        <p className="text-center mt-5 text-[14px] text-[#a0a6b5]">
           Already have an account?{" "}
           <button
             type="button"
+            onClick={() => navigate("/login")}
             className="
               text-[#7767ff]
               hover:text-[#8b7eff]

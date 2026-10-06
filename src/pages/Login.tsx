@@ -1,7 +1,63 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { API_URL } from "../lib/config";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const [loginErrors, setLoginErrors] = useState("");
+
+  const loginSchema = z.object({
+    username: z
+      .string()
+      .trim()
+      .min(3, { error: "Username must be at least 3 character" })
+      .max(20, "Username cannot exceed greater than 20 characters")
+      .regex(/^[a-zA-Z0-9_]+$/, {
+        error: "Username can only contain letter, number and underscore",
+      }),
+    password: z
+      .string()
+      .trim()
+      .min(8, "Password must be at least 8 characters long."),
+  });
+
+  type Schema = z.infer<typeof loginSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const submitLogin = async ({ username, password }: Schema) => {
+    console.log(API_URL);
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      console.log(data.error);
+      if (data.error) {
+        setLoginErrors(data.error);
+      }
+      const { success } = data;
+      if (success) {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0b0d11] flex items-center justify-center px-6 text-white">
@@ -37,20 +93,26 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="space-y-3">
+        {loginErrors && (
+          <p className="text-md border text-center border-red-600 text-red-600 py-1 my-3">
+            {loginErrors}
+          </p>
+        )}
+        <form className="space-y-3" onSubmit={handleSubmit(submitLogin)}>
           {/* Email */}
           <div>
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block mb-1.5 text-[13px] text-[#aeb4c4]"
             >
-              Work email
+              Username
             </label>
 
             <input
-              id="email"
-              type="email"
-              placeholder="jane@company.com"
+              id="username"
+              type="text"
+              {...register("username")}
+              placeholder="jane_10"
               className="
                 w-full h-9 rounded-[7px]
                 border border-[#292d36]
@@ -64,6 +126,7 @@ export default function LoginPage() {
                 focus:ring-1 focus:ring-[#6858f5]
               "
             />
+            {errors.username && <p>{errors.username.message}</p>}
           </div>
 
           {/* Password */}
@@ -79,6 +142,7 @@ export default function LoginPage() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
+                {...register("password")}
                 placeholder="••••••••••"
                 className="
                   w-full h-9 rounded-[7px]
@@ -93,6 +157,7 @@ export default function LoginPage() {
                   focus:ring-1 focus:ring-[#6858f5]
                 "
               />
+              {errors.password && <p>{errors.password.message}</p>}
 
               <button
                 type="button"
@@ -164,6 +229,7 @@ export default function LoginPage() {
           Don&apos;t have an account?{" "}
           <button
             type="button"
+            onClick={() => navigate("/signup")}
             className="text-[#7767ff] hover:text-[#8b7eff] transition"
           >
             Sign up
