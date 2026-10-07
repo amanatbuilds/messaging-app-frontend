@@ -52,6 +52,7 @@ export default function SignupPage() {
       const data = await res.json();
       if (data.error) {
         setSignupErrors(data.error);
+        return;
       }
       const { success } = data;
       if (success) {
@@ -97,7 +98,7 @@ export default function SignupPage() {
           </p>
         </div>
         {signupErrors && (
-          <p className="text-red-500 text-center text-md my-3 border border-red-500 py-1">
+          <p className="text-[#fa777c] bg-[#f23f421f] text-center text-md my-3 border border-[#da373c] py-1">
             {signupErrors}
           </p>
         )}

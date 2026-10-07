@@ -49,6 +49,7 @@ export default function LoginPage() {
       console.log(data.error);
       if (data.error) {
         setLoginErrors(data.error);
+        return;
       }
       const { success } = data;
       if (success) {

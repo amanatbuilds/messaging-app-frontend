@@ -14,7 +14,7 @@ const conversations: Conversation[] = [
   {
     name: "Amara Chen",
     initials: "AC",
-    preview: "Looks great, I'll check aft...",
+    preview: "Looks great, I'll check after that work.",
     time: "10:16 AM",
     avatar: "bg-emerald-950",
     text: "text-teal-300",

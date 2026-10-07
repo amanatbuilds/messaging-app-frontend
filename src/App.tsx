@@ -4,6 +4,7 @@ import SignupPage from "./pages/Signup";
 import Faltu from "./components/Faltu";
 import { useContext, type ReactNode } from "react";
 import { AuthContext } from "./contexts/AuthContext";
+import Home from "./pages/Home";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, token } = useContext(AuthContext);
@@ -27,6 +28,7 @@ function App() {
   return (
     <>
       <Routes>
+        <Route path="/msg" element={<Home />} />
         <Route
           path="/"
           element={
