@@ -1,7 +1,7 @@
 import LoginPage from "./pages/Login";
 import { Routes, Route, Navigate } from "react-router";
 import SignupPage from "./pages/Signup";
-import Faltu from "./components/Faltu";
+// import Faltu from "./components/Faltu";
 import { useContext, type ReactNode } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 import Home from "./pages/Home";
@@ -28,12 +28,12 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/msg" element={<Home />} />
+        {/* <Route path="/msg" element={<Home />} /> */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <Faltu />
+              <Home />
             </ProtectedRoute>
           }
         />

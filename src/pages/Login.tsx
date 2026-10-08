@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { API_URL } from "../lib/config";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function LoginPage() {
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [loginErrors, setLoginErrors] = useState("");
@@ -36,7 +38,6 @@ export default function LoginPage() {
   });
 
   const submitLogin = async ({ username, password }: Schema) => {
-    console.log(API_URL);
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
@@ -46,15 +47,19 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
-      console.log(data.error);
-      if (data.error) {
+      console.log(data);
+      if (data.user.error) {
+        console.log("error true");
         setLoginErrors(data.error);
         return;
       }
-      const { success } = data;
-      if (success) {
-        navigate("/");
+      if (!data.user.success) {
+        setLoginErrors("Unable to login");
+        return;
       }
+      console.log("success true");
+      login(data.user.token);
+      navigate("/");
     } catch (error) {
       console.error(error);
     }

@@ -6,9 +6,9 @@ import { API_URL } from "../lib/config";
 import { useNavigate } from "react-router";
 
 export default function SignupPage() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [signupErrors, setSignupErrors] = useState("");
-  const navigate = useNavigate();
 
   const signupSchema = z.object({
     name: z
@@ -54,8 +54,7 @@ export default function SignupPage() {
         setSignupErrors(data.error);
         return;
       }
-      const { success } = data;
-      if (success) {
+      if (data.user.success) {
         navigate("/login");
       }
     } catch (error) {
