@@ -7,19 +7,10 @@ import { AuthContext } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
-  if (!user || !token) {
+  if (!token) {
     return <Navigate to="/login" replace />;
-  }
-  return children;
-}
-
-function ProtectedPages({ children }: { children: ReactNode }) {
-  const { user, token } = useContext(AuthContext);
-
-  if (user || token) {
-    return <Navigate to="/" replace />;
   }
   return children;
 }
@@ -28,7 +19,6 @@ function App() {
   return (
     <>
       <Routes>
-        {/* <Route path="/msg" element={<Home />} /> */}
         <Route
           path="/"
           element={
@@ -37,22 +27,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/login"
-          element={
-            <ProtectedPages>
-              <LoginPage />
-            </ProtectedPages>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <ProtectedPages>
-              <SignupPage />
-            </ProtectedPages>
-          }
-        />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </>
   );

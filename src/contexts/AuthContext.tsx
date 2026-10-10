@@ -26,7 +26,7 @@ export const AuthContext = createContext(defaultVal);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   const login = (newToken: string) => {
     setToken(newToken);
@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     try {
       const decode: User = jwtDecode(token);
+      // console.log(token);
 
       if (decode.exp! * 1000 < Date.now()) {
         throw new Error("Token is expired");
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ login, logout, user, token }}>
