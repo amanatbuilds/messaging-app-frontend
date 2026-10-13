@@ -10,15 +10,12 @@ const AddUser = () => {
    []
   );
 
-  // const arr = users.find((myUser) => myUser.id === user?.id)?.sentRequests;
-  // console.log(arr?.map((obj) => obj.receiver.username));
-
   useEffect(() => {
-    const currentUser = users.find(myUser => myUser.id === user.id)
+    const currentUser = users.find(myUser => myUser.id === user?.id)
     setAddFriendUser(currentUser?.sentRequests ?? []);
   }, [users, user?.id]);
 
-  const isRequestSent = (reqUserId) => {
+  const isRequestSent = (reqUserId: number) => {
     return addFriendUser.some(reqUser => reqUser.receiver.id === reqUserId);
   }
 
@@ -60,7 +57,6 @@ const AddUser = () => {
                         >
                           Add User
                         </div>}
-
           </div>
         ))}
     </div>

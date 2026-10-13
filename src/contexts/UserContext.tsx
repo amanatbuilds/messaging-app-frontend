@@ -34,7 +34,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
         const data = await res.json();
         setUsers(data.users);
-        console.log(data.users);
       } catch (error) {
         console.error(error);
       }
