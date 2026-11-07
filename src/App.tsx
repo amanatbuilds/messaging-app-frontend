@@ -7,9 +7,9 @@ import { AuthContext } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { token } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
 
-  if (!token) {
+  if (!token && !user) {
     return <Navigate to="/login" replace />;
   }
   return children;

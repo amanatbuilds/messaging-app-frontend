@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [loginErrors, setLoginErrors] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const loginSchema = z.object({
     username: z
@@ -38,6 +39,8 @@ export default function LoginPage() {
   });
 
   const submitLogin = async ({ username, password }: Schema) => {
+    setLoginErrors("");
+    setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
@@ -47,21 +50,22 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
-      console.log(data);
-      if (data.user.error) {
-        console.log("error true");
-        setLoginErrors(data.error);
+      if (!res.ok || data.error || !data.user.token) {
+        setLoginErrors(data.error ?? "Unable to login.");
         return;
       }
-      if (!data.user.success) {
-        setLoginErrors("Unable to login");
-        return;
-      }
-      console.log("success true");
       login(data.user.token);
       navigate("/");
+      console.log(data);
+
+      console.log("success true");
     } catch (error) {
+      setLoginErrors(
+        "Cannot react the server. Check your connection and try again.",
+      );
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,7 +136,9 @@ export default function LoginPage() {
                 focus:ring-1 focus:ring-[#6858f5]
               "
             />
-            {errors.username && <p>{errors.username.message}</p>}
+            {errors.username && (
+              <p className="text-red-400">{errors.username.message}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -163,7 +169,9 @@ export default function LoginPage() {
                   focus:ring-1 focus:ring-[#6858f5]
                 "
               />
-              {errors.password && <p>{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-400">{errors.password.message}</p>
+              )}
 
               <button
                 type="button"
@@ -215,6 +223,7 @@ export default function LoginPage() {
           {/* Submit */}
           <button
             type="submit"
+            disabled={loading}
             className="
               w-full h-9.5
               rounded-[7px]
@@ -223,10 +232,10 @@ export default function LoginPage() {
               active:bg-[#5c4de3]
               text-[13px] font-semibold
               transition-colors
-              mt-1
+              mt-1 disabled:opacity-60 disabled:cursor-not-allowed
             "
           >
-            Log in
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
 

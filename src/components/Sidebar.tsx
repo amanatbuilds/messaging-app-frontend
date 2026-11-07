@@ -1,48 +1,18 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import type { User } from "../pages/Home";
 import Chats from "./Chats";
 import AddUser from "./AddUser";
 import RequestUser from "./RequestUser";
 
 interface SidebarProps {
-  activeUser: User | null;
-  setActiveUser: React.Dispatch<React.SetStateAction<User | null>>;
+  activeChatId: number | null;
+  setActiveChatId: (chatId: number | null) => void;
 }
 
-const Sidebar = ({ activeUser, setActiveUser }: SidebarProps) => {
+const Sidebar = ({ activeChatId, setActiveChatId }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState("message");
   const { logout, user } = useContext(AuthContext);
-  const arr: User[] = [
-    {
-      id: 1,
-      name: "Fake User",
-      avatar: "FU",
-      message: "Send an API Docs",
-      username: "fake_10",
-    },
-    {
-      id: 2,
-      name: "Amara Chen",
-      avatar: "AC",
-      message: "Send an API Docs",
-      username: "amara_12",
-    },
-    {
-      id: 3,
-      name: "Aman Khan",
-      avatar: "AK",
-      message: "Send an API Docs",
-      username: "hello_11",
-    },
-    {
-      id: 4,
-      name: "John Doe",
-      avatar: "JD",
-      message: "Send an API Docs for project",
-      username: "john_19",
-    },
-  ];
+
   return (
     <aside className="w-86 bg-[#12151C] shrink-0 min-h-screen overflow-hidden px-3 py-5">
       <div className="flex justify-between items-center my-3">
@@ -70,9 +40,8 @@ const Sidebar = ({ activeUser, setActiveUser }: SidebarProps) => {
       {activeTab === "message" && (
         <div className="mt-8">
           <Chats
-            users={arr}
-            activeUser={activeUser}
-            setActiveUser={setActiveUser}
+            activeChatId={activeChatId}
+            setActiveChatId={setActiveChatId}
           />
         </div>
       )}

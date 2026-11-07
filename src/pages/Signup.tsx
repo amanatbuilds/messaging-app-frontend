@@ -9,6 +9,7 @@ export default function SignupPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [signupErrors, setSignupErrors] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const signupSchema = z.object({
     name: z
@@ -40,6 +41,8 @@ export default function SignupPage() {
   });
 
   const submitSignup = async ({ name, username, password }: Schema) => {
+    setSignupErrors("");
+    setLoading(true);
     console.log(API_URL);
     try {
       const res = await fetch(`${API_URL}/api/auth/register`, {
@@ -50,15 +53,18 @@ export default function SignupPage() {
         body: JSON.stringify({ name, username, password }),
       });
       const data = await res.json();
-      if (data.error) {
-        setSignupErrors(data.error);
+      if (!res.ok || data.error) {
+        setSignupErrors(data.error ?? "Signup failed. Please try again.");
         return;
       }
-      if (data.user.success) {
-        navigate("/login");
-      }
+      navigate("/login");
     } catch (error) {
+      setSignupErrors(
+        "Cannot reach the server. Check your connection and try again",
+      );
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -251,6 +257,7 @@ export default function SignupPage() {
           {/* Create account */}
           <button
             type="submit"
+            disabled={loading}
             className="
               w-full h-9.5
               rounded-[7px]
@@ -261,9 +268,10 @@ export default function SignupPage() {
               font-semibold
               transition-colors
               mt-1 cursor-pointer
+              disabled:opacity-60 disabled:cursor-not-allowed
             "
           >
-            Create account
+            {loading ? "Creating account" : "Create account"}
           </button>
         </form>
 

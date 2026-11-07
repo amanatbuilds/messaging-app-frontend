@@ -1,6 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import MessageBox from "../components/MessageBox";
 import { useState } from "react";
+import { ChatProvider } from "../contexts/ChatContext";
 
 export interface User {
   id: number;
@@ -11,12 +12,17 @@ export interface User {
 }
 
 const Home = () => {
-  const [activeUser, setActiveUser] = useState<User | null>(null);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
   return (
-    <div className="flex">
-      <Sidebar activeUser={activeUser} setActiveUser={setActiveUser} />
-      <MessageBox activeUser={activeUser} />
-    </div>
+    <ChatProvider>
+      <div className="flex">
+        <Sidebar
+          activeChatId={activeChatId}
+          setActiveChatId={setActiveChatId}
+        />
+        <MessageBox key={activeChatId} activeChatId={activeChatId} />
+      </div>
+    </ChatProvider>
   );
 };
 
